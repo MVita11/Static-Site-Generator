@@ -1,6 +1,6 @@
 import unittest
 
-from textnode import TextNode, TextType, text_node_to_html_node
+from textnode import TextNode, TextType, text_node_to_html_node, split_nodes_delimiter, extract_markdown_images
 class TestTextNode(unittest.TestCase):
     def test_eq(self):
         node = TextNode("This is a text node", TextType.BOLD, url=None)
@@ -31,7 +31,19 @@ class TestTextNode(unittest.TestCase):
         node = TextNode("This is a text node", TextType.TEXT)
         html_node = text_node_to_html_node(node)
         self.assertEqual(html_node.tag, None)
-        self.assertEqual(html_node.value, "This is a text node")    
-
+        self.assertEqual(html_node.value, "This is a text node")  
+        
+    def test_happy_path(self):
+        node = TextNode("This is a `code` word", TextType.TEXT)
+        split_node = split_nodes_delimiter([node], "`", TextType.CODE)
+        self.assertEqual(
+            split_node,
+            [
+                TextNode("This is a ", TextType.TEXT),
+                TextNode("code", TextType.CODE),
+                TextNode(" word", TextType.TEXT),
+            ]             
+        )
+    
 if __name__ == "__main__":
     unittest.main()
