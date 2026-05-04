@@ -45,5 +45,28 @@ class TestTextNode(unittest.TestCase):
             ]             
         )
     
+    def test_extract_markdown_images_single(self):
+        matches = extract_markdown_images("This is an ![mountain](https://example.com/mountain.png)")
+        self.assertListEqual([("mountain", "https://example.com/mountain.png")], matches)
+        
+    def test_extract_markdown_images_multiple(self):
+        matches = extract_markdown_images(
+            "Here is ![one](https://example.com/1.png) and ![two](https://example.com/2.png)"
+        )
+        self.assertListEqual([
+            ("one", "https://example.com/1.png"),
+            ("two", "https://example.com/2.png"),
+        ], matches)
+    
+    def test_extract_markdown_images_multiple_links(self):
+        matches = extract_markdown_images(
+            "Here is ![Boot.dev](https://www.boot.dev) and ![Google](https://www.google.com)"   
+        )
+        self.assertListEqual([
+            ("Boot.dev", "https://www.boot.dev"),
+            ("Google", "https://www.google.com"),
+            
+        ], matches)
+        
 if __name__ == "__main__":
     unittest.main()
