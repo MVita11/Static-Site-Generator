@@ -1,6 +1,6 @@
 import unittest
 
-from textnode import TextNode, TextType, text_node_to_html_node, split_nodes_delimiter, extract_markdown_images, split_nodes_image
+from textnode import TextNode, TextType, text_node_to_html_node, split_nodes_delimiter, extract_markdown_images, split_nodes_image, split_nodes_link
 class TestTextNode(unittest.TestCase):
     def test_eq(self):
         node = TextNode("This is a text node", TextType.BOLD, url=None)
@@ -82,6 +82,59 @@ class TestTextNode(unittest.TestCase):
             TextNode(
                 "second image", TextType.IMAGE, "https://i.imgur.com/3elNhQu.png"
             ),
+        ],
+        new_nodes,
+    )
+       
+    def test_one_image(self):
+        node = TextNode(
+            "![image](https://i.imgur.com/zjjcJKZ.png)",
+            TextType.TEXT
+        )    
+        new_nodes = split_nodes_image([node])
+        self.assertEqual([
+            TextNode("image", TextType.IMAGE, "https://i.imgur.com/zjjcJKZ.png"),
+        ],
+        new_nodes,
+    )
+    
+    def test_one_link(self):
+        node = TextNode(
+            "[Boot.dev](https://boot.dev)",
+            TextType.TEXT
+        )
+        new_nodes = split_nodes_link([node])
+        self.assertListEqual([
+            TextNode("Boot.dev", TextType.LINK, "https://boot.dev"),        
+        ],
+        new_nodes,
+    )
+        
+    def test_split_image_only(self):
+        node = TextNode(
+        "![logo](https://example.com/logo.png)",
+        TextType.TEXT,
+    )
+        new_nodes = split_nodes_image([node])
+        self.assertListEqual(
+        [
+            TextNode("logo", TextType.IMAGE, "https://example.com/logo.png"),
+        ],
+        new_nodes,
+    )
+    
+    def test_split_links_multiple(self):
+        node = TextNode(
+        "Visit [Boot.dev](https://boot.dev) and [Google](https://www.google.com)",
+        TextType.TEXT,
+    )
+        new_nodes = split_nodes_link([node])
+        self.assertListEqual(
+        [
+            TextNode("Visit ", TextType.TEXT),
+            TextNode("Boot.dev", TextType.LINK, "https://boot.dev"),
+            TextNode(" and ", TextType.TEXT),
+            TextNode("Google", TextType.LINK, "https://www.google.com"),
         ],
         new_nodes,
     )
