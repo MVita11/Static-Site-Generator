@@ -1,5 +1,5 @@
 import unittest
-from markdown_block import markdown_to_blocks
+from markdown_block import markdown_to_blocks, block_to_block_type, BlockType
 
 class TestMarkdownToBlocks(unittest.TestCase):
         def test_markdown_to_blocks(self):
@@ -21,3 +21,14 @@ This is the same paragraph on a new line
                     "- This is a list\n- with items",
                 ],
             )
+            
+        def test_headings(self):
+            self.assertEqual(block_to_block_type("# Hello"), BlockType.HEADING)
+            self.assertEqual(block_to_block_type("## Hello"), BlockType.HEADING)
+            self.assertEqual(block_to_block_type("### Hello"), BlockType.HEADING)
+            self.assertEqual(block_to_block_type("#### Hello"), BlockType.HEADING)
+            self.assertEqual(block_to_block_type("##### Hello"), BlockType.HEADING)
+            self.assertEqual(block_to_block_type("###### Hello"), BlockType.HEADING)
+
+        def test_heading_no_space(Self):
+            self.assertEqual(block_to_block_type("#Hello"), BlockType.PARAGRAPH)
